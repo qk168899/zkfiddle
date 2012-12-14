@@ -215,26 +215,7 @@
 		<scope>runtime</scope>
 	</dependency>
 
-	<!-- custom components
-	<dependency>
-		<groupId>org.zkoss.fiddle</groupId>
-		<artifactId>zk-fiddletabs</artifactId>
-		<version>0.8.0</version>
-		<optional>true</optional>
-	</dependency>
-	<dependency>
-		<groupId>org.zkoss.fiddle</groupId>
-		<artifactId>texttab</artifactId>
-		<version>0.8.0</version>
-		<optional>true</optional>
-	</dependency>
-	<dependency>
-		<groupId>org.zkoss.external</groupId>
-		<artifactId>codeeditor</artifactId>
-		<version>0.8.0</version>
-		<optional>true</optional>
-	</dependency>
-	 -->
+
 	<!-- hsqldb -->
 	<!--
 	-->
@@ -298,7 +279,33 @@
     </dependency>
 
     <!--  logging end -->
-	
+		<!-- custom components
+	<dependency>
+		<groupId>org.zkoss.fiddle</groupId>
+		<artifactId>zk-fiddletabs</artifactId>
+		<version>0.8.0</version>
+		<optional>true</optional>
+	</dependency>
+	<dependency>
+		<groupId>org.zkoss.fiddle</groupId>
+		<artifactId>texttab</artifactId>
+		<version>0.8.0</version>
+		<optional>true</optional>
+	</dependency>
+	<dependency>
+		<groupId>org.zkoss.external</groupId>
+		<artifactId>codeeditor</artifactId>
+		<version>0.8.0</version>
+		<optional>true</optional>
+	</dependency>
+	 -->
+	 <dependency>
+		<groupId>org.zkoss.zorum</groupId>
+		<artifactId>ZorumLoginService</artifactId>
+		<version>0.8.0</version>
+		<!-- <scope>system</scope>
+        <systemPath>${project.basedir}/src/main/webapp/WEB-INF/lib/ZorumLoginService.jar</systemPath> -->
+	</dependency>
 	<!-- Jars in WEB-INF/lib start -->
 	<dependency>
         <groupId>org.zkfiddle.file</groupId>
@@ -315,11 +322,11 @@
         <systemPath>${project.basedir}/src/main/webapp/WEB-INF/lib/hyperlink-${hyperlink.version}.jar</systemPath>
     </dependency>
 	<dependency>
-        <groupId>org.zkfiddle.file</groupId>
-        <artifactId>loginServiceApi</artifactId>
+        <groupId>org.zkoss.service</groupId>
+        <artifactId>LoginServiceApi</artifactId>
         <version>${loginServiceApi.version}</version>
-        <scope>system</scope> 
-        <systemPath>${project.basedir}/src/main/webapp/WEB-INF/lib/LoginServiceApi-${loginServiceApi.version}.jar</systemPath>
+        <!-- <scope>system</scope> 
+        <systemPath>${project.basedir}/src/main/webapp/WEB-INF/lib/LoginServiceApi-${loginServiceApi.version}.jar</systemPath> -->
     </dependency>	
 	<dependency>
         <groupId>org.zkfiddle.file</groupId>
@@ -379,6 +386,8 @@
     </dependency>
 	<!-- Jars in WEB-INF/lib end -->
   </dependencies>
+  
+  
   <build>
     <finalName>datahandler</finalName>
     <plugins>
@@ -405,7 +414,7 @@
           <source>1.5</source>
           <target>1.5</target>
         </configuration>
-      </plugin>	  
+      </plugin>
 	<plugin>
 		<artifactId>maven-war-plugin</artifactId>
 		<configuration>

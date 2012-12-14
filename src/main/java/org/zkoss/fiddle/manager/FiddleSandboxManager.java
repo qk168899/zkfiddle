@@ -1,6 +1,7 @@
 package org.zkoss.fiddle.manager;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -25,7 +26,7 @@ public class FiddleSandboxManager {
 
 	private Map<String, FiddleSandbox> sandboxesByHash = new HashMap<String, FiddleSandbox>();
 
-	private Map<String, List<FiddleSandbox>> sandboxesByVersion = new TreeMap<String, List<FiddleSandbox>>();
+//	private Map<String, List<FiddleSandbox>> sandboxesByVersion = new TreeMap<String, List<FiddleSandbox>>();
 
 	private String latest = "5.0.8";
 
@@ -65,28 +66,31 @@ public class FiddleSandboxManager {
 		this.addFiddleSandbox(sandbox);
 	}
 
-	public FiddleSandbox getFiddleSandbox(String hash) {
+	public synchronized FiddleSandbox getFiddleSandbox(String hash) {
 		return checkDate(sandboxesByHash.get(hash));
 
 	}
 	
-	public int getAmount(){
+	public synchronized int getAmount(){
 		return sandboxesByHash.size();
 	}
 
 	/**
 	 * organize by version
-	 * @return
+	 * @return a list of FiddleSandboxGroup, order by version
 	 */
-	public List<FiddleSandboxGroup> getFiddleSandboxGroups(){
+	public synchronized List<FiddleSandboxGroup> getFiddleSandboxGroups(){
 		
 	
-		Set<String> keyset = new TreeSet<String>(new VersionComparator());
-		keyset.addAll(sandboxesByVersion.keySet());
+		
+		Map<String, List<FiddleSandbox>> sandboxesByVersion = groupByVer(sandboxesByHash.values());
+		
+		List<String> keys = new ArrayList<String>(sandboxesByVersion.keySet());
+		Collections.sort(keys, new VersionComparator());
 
 		List<FiddleSandboxGroup> groups = new ArrayList<FiddleSandboxGroup>();
-		
-		for(String key:keyset){
+
+		for(String key : keys){
 			List<FiddleSandbox> sandboxs = new ArrayList<FiddleSandbox>(sandboxesByVersion.get(key));
 			
 			Collections.sort(sandboxs);
@@ -97,35 +101,64 @@ public class FiddleSandboxManager {
 		return groups;
 	}
 	
-	public FiddleSandbox getFiddleSandboxForLastestVersion() {
+	private static Map<String, List<FiddleSandbox>> groupByVer(Collection<FiddleSandbox>  fsBoxs) {
+		Map<String, List<FiddleSandbox>> sandboxesByVersion = 
+			new TreeMap<String, List<FiddleSandbox>>();
+		
+		List<FiddleSandbox> temp = null;
+		for(FiddleSandbox fsBox : fsBoxs){
+			String ver = fsBox.getZKVersion();
+			temp = sandboxesByVersion.get(ver);
+			if(temp==null){
+				sandboxesByVersion.put(ver, temp = new ArrayList<FiddleSandbox>());
+			}
+			
+			temp.add(fsBox);
+			
+		}
+		
+		for(Map.Entry<String, List<FiddleSandbox>> entry : sandboxesByVersion.entrySet()){
+			System.out.println(">>>>>ver: "+entry.getKey());
+			for(FiddleSandbox fsBox: entry.getValue()){
+				System.out.println("\tfsBox: "+fsBox);
+			}
+		}
+		return sandboxesByVersion;
+	}
+	
+	
+	public synchronized FiddleSandbox getFiddleSandboxForLastestVersion() {
 		return getFiddleSandboxByVersion(latest);
 	}
 
-	public FiddleSandbox getFiddleSandboxByVersion(String version) {
+	public synchronized FiddleSandbox getFiddleSandboxByVersion(String version) {
 
 		if(version == null)
 			return null;
 
 		version = version.trim();
-
-		for (FiddleSandbox fi : getVersionList(version)) {
-			FiddleSandbox sandbox = checkDate(fi);
-			if (sandbox != null)
-				return sandbox;
+		Map<String, List<FiddleSandbox>> sandboxesByVersion = groupByVer(sandboxesByHash.values());
+		 List<FiddleSandbox> fsBoxs = sandboxesByVersion.get(version);
+		if(fsBoxs!=null){
+			for (FiddleSandbox fi : fsBoxs) {
+				FiddleSandbox sandbox = checkDate(fi);
+				if (sandbox != null)
+					return sandbox;
+			}	
 		}
 		return null;
 
 	}
 
-	private List<FiddleSandbox> getVersionList(String ver) {
-		if (sandboxesByVersion.containsKey(ver)) {
-			return sandboxesByVersion.get(ver);
-		} else {
-			List<FiddleSandbox> list = new ArrayList<FiddleSandbox>();
-			sandboxesByVersion.put(ver, list);
-			return list;
-		}
-	}
+//	private List<FiddleSandbox> getVersionList(String ver) {
+//		if (sandboxesByVersion.containsKey(ver)) {
+//			return sandboxesByVersion.get(ver);
+//		} else {
+//			List<FiddleSandbox> list = new ArrayList<FiddleSandbox>();
+//			sandboxesByVersion.put(ver, list);
+//			return list;
+//		}
+//	}
 
 	private FiddleSandbox checkDate(FiddleSandbox os) {
 		if (os == null)
@@ -142,27 +175,27 @@ public class FiddleSandboxManager {
 	
 	public void clear(){
 		sandboxesByHash.clear();
-		sandboxesByVersion.clear();
+//		sandboxesByVersion.clear();
 	}
 
-	public void removeSandbox(String hash) {
+	public synchronized void removeSandbox(String hash) {
 
 		FiddleSandbox ins = sandboxesByHash.get(hash);
 		if(ins != null){
 			sandboxesByHash.remove(hash);
-			getVersionList(ins.getZKVersion()).remove(ins);
+//			getVersionList(ins.getZKVersion()).remove(ins);
 		}
 
 	}
 
-	public void addFiddleSandbox(FiddleSandbox sandbox) {
+	public synchronized void addFiddleSandbox(FiddleSandbox sandbox) {
 		if (sandbox == null || sandbox.getPath() == null) {
 			throw new IllegalArgumentException("sandbox and sandbox path can't be null ");
 		}
-
-		if(!sandboxesByHash.containsKey(sandbox.getHash())){
-			getVersionList(sandbox.getZKVersion()).add(sandbox);
-		}
+		System.out.println(">>>> FiddleSandboxManager: addFiddleSandbox "+sandbox);
+//		if(!sandboxesByHash.containsKey(sandbox.getHash())){
+//			getVersionList(sandbox.getZKVersion()).add(sandbox);
+//		}
 
 		sandboxesByHash.put(sandbox.getHash(), sandbox);
 		Date d = new Date();
@@ -180,17 +213,17 @@ public class FiddleSandboxManager {
 	/**
 	 * @return
 	 */
-	public Map<String, FiddleSandbox> listFiddleInstances() {
+	public synchronized Map<String, FiddleSandbox> listFiddleInstances() {
 		return Collections.unmodifiableMap(sandboxesByHash);
 	}
 
-	public List<String> getAvailableVersions() {
+	public synchronized List<String> getAvailableVersions() {
 		List<String> array = new ArrayList<String>();
-		synchronized (sandboxesByVersion) {
-			for (String key : sandboxesByVersion.keySet()) {
-				if (sandboxesByVersion.get(key).size() != 0) {
-					array.add(key);
-				}
+		Map<String, List<FiddleSandbox>> sandboxesByVersion = groupByVer(sandboxesByHash.values());
+		
+		for (String key : sandboxesByVersion.keySet()) {
+			if (sandboxesByVersion.get(key).size() != 0) {
+				array.add(key);
 			}
 		}
 		return array;

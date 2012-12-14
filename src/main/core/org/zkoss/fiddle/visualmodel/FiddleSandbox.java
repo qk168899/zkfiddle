@@ -145,4 +145,12 @@ public class FiddleSandbox implements Comparable<Object> {
 	public void setStatus(Status status) {
 		this.status = status;
 	}
+
+	@Override
+	public String toString() {
+		return "FiddleSandbox [hash=" + hash + ", name=" + name + ", theme="
+				+ theme + ", path=" + path + ", lastUpdate=" + lastUpdate
+				+ ", version=" + version + ", status=" + status + "]";
+	}
+	
 }

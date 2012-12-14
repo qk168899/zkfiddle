@@ -239,7 +239,7 @@
 
  	<filter-mapping>
 		<filter-name>StatusFilter</filter-name>
-		<url-pattern>/status/</url-pattern>
+		<url-pattern>/status/*</url-pattern>
 	</filter-mapping>
 
  	<filter-mapping>

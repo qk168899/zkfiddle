@@ -48,8 +48,8 @@ public class FiddleSandboxFilter implements Filter {
 						httprequest.getParameter("ver"+i),
 						httprequest.getParameter("theme"+i)		
 				) ;
+//				System.out.println(">>>>>>>>>>>>> add new Sandbox: "+httprequest.getParameter("name"+i));
 				success = success && curSuccess;
-				
 			}
 			
 			if (success) {

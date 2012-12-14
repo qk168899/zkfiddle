@@ -9,7 +9,7 @@
 <zk>
     <library-property>
         <name>org.zkoss.fiddle.hostname</name>
-        <value>http://localhost:9999/datahandler</value>
+        <value>http://localhost:8080/zkfiddle</value>
     </library-property>
 	<client-config>
 		<debug-js>true</debug-js>

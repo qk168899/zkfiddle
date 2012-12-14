@@ -166,7 +166,7 @@ public class FiddleViewFilter extends FiddleViewBaseFilter {
 		return taglist.toString();
 	}
 
-	/* ------------ internal implemenation ------------- */
+	/* ------------ internal implementation ------------- */
 
 	protected void initSandbox(HttpServletResponse response, HttpServletRequest request, CaseRequest viewRequest)
 			throws IOException {
